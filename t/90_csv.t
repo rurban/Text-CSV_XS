@@ -76,9 +76,12 @@ ok (csv (in => $aoh, out => $tfn, headers => "auto"), "AOH out file");
 is_deeply (csv (in => $tfn, headers => "auto"), $aoh, "AOH parse out");
 
 ok (csv (in => $aoh, out => $tfn, headers => "skip"), "AOH out file no header");
-is_deeply (csv (in => $tfn, headers => [keys %{$aoh->[0]}]),
-    $aoh, "AOH parse out no header");
-
+SKIP: {
+   skip "parse without headers is unstable with unusual hash strategy", 1
+     if $Config{usecperl};
+   is_deeply (csv (in => $tfn, headers => \@hdr),
+              $aoh, "AOH parse out no header");
+}
 my $idx = 0;
 sub getrowa { return $aoa->[$idx++]; }
 sub getrowh { return $aoh->[$idx++]; }
